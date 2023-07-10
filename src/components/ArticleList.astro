@@ -1,0 +1,29 @@
+---
+const posts = await Astro.glob('../pages/posts/*.md')
+---
+
+<div class="text-right flex flex-wrap justify-center mb-9">
+  {posts.map((item) => (
+    <div class="mt-4">
+      <div id="card" class="card w-60vw min-w-80 bg-neutral text-neutral-content shadow-xl" data-link={item.frontmatter.title} data-card>
+        <div class="card-body">
+          <p class="card-title">{item.frontmatter.title}</p>
+          <p>{item.frontmatter.time}</p>
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<script>
+const jumpToArticle = (element: HTMLElement) => {
+  const link = element.dataset.link?.replace(/\s/g, "")
+  window.location.href = '/posts/' + link
+}
+
+const cards = document.querySelectorAll('[data-card]')
+cards.forEach(card => {
+  card.addEventListener("click", () => jumpToArticle(card as HTMLElement))
+})
+</script>
+

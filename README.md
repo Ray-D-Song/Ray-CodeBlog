@@ -1,0 +1,1 @@
+Just a boring blog system.

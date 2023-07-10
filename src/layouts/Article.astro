@@ -1,0 +1,161 @@
+---
+const { frontmatter } = Astro.props
+const posts = await Astro.glob('../pages/posts/*.md')
+const { posttitles = posts.map((post) => post.frontmatter.title) } = Astro.props
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+
+    <script is:inline>
+
+      if (localStorage.getItem("theme") === null) {
+        document.documentElement.setAttribute("data-theme", "night");
+      } else
+        document.documentElement.setAttribute(
+          "data-theme",
+          localStorage.getItem("theme")
+        );
+
+    </script>
+    <script>
+      import { themeChange } from 'theme-change';
+      themeChange()
+    </script>
+
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{ frontmatter.title }</title>
+	</head>
+
+  <input type="checkbox" id="search-modal" class="modal-toggle" />
+
+  <div class="modal">
+    <div class="modal-box relative w-90vw">
+      <label for="search-modal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+
+      <astro-search data-posttitles={posttitles}>
+        <input id="searchForm" type="text" placeholder="Search" class="input input-bordered input-info w-11/12"/>
+      </astro-search>
+
+      <ul class="menu bg-base-100 w-11/12 my-2 h-96"/>
+    </div>
+  </div>
+
+	<body>
+
+    <div class="flex items-center mt-2">
+      <label for="search-modal" class="input input-bordered input-secondary w-full max-w-xs ml-5"> Search </label>
+
+      <!-- <div class="w-screen flex justify-end" class="blurBg">
+        <div class="flex items-center mr-5">
+          <span class="mr-1">
+            Light
+          </span>
+            <input id="toggleTheme" data-toggle-theme="night,light" type="checkbox" class="toggle toggle-info" checked data-theme-toggle/>
+          <span class="ml-1">
+            Dark
+          </span>
+        </div>
+      </div> -->
+    </div>
+    
+    <div class="
+      flex w-95vw items-center flex-col p-8
+
+      prose-headings:my-2
+
+      prose-p:my-2
+      prose-p:tracking-wide
+
+      prose-h1:text-3xl
+      prose-h1:text-blue-500
+      prose-h1:font-extrabold
+      prose-h1:mt-6
+
+      prose-h2:text-2xl
+      prose-h2:text-blue-400
+
+      prose-h3:text-xl
+      prose-h3:text-blue-300
+
+      prose-blockquote:pl-4
+      prose-blockquote:border-l-2
+      prose-blockquote:italic
+
+      prose-ol:list-decimal
+      prose-ol:ml-8
+
+      prose-ul:my-2
+      prose-ul:list-disc
+
+      prose-a:box
+
+      prose-image:mx-auto 
+
+      prose-pre:w-85vw 
+      prose-pre:md:w-80vw
+      prose-pre:lg:w-70vw
+      prose-pre:xl:w-65vw
+
+      prose-code:text-sky-400
+    ">
+      <div class="w-90vw md:w-80vw lg:w-70vw xl:w-65vw">
+        <div class="text-center text-3xl font-medium mb-9">{ frontmatter.title }</div>
+		    <slot />
+      </div>
+    </div>
+
+    <script>
+      const switchTheme = () => {
+        const theme = document.documentElement.getAttribute('data-theme')
+        document.documentElement.setAttribute('data-theme', theme === 'light' ? 'night' : 'light')
+      }
+
+      const toggleTheme = document.getElementById('toggleTheme')
+      toggleTheme?.addEventListener('click', switchTheme)
+
+      const filterArrayByKeyword = (keyword: string, articleArray: string[]) => {
+        return articleArray.filter((element) => element.includes(keyword));
+      }
+
+      const showResults = (results: string[]) => {
+        const menu = document.querySelector('.menu')
+        if(menu)
+          menu.innerHTML = ''
+        results.forEach((result) => {
+          const li = document.createElement('li')
+          const a = document.createElement('a')
+          a.innerHTML = result
+          a.setAttribute('href', `/posts/${result.replace(/ /g, '')}`)
+          li.appendChild(a)
+          menu?.appendChild(li)
+        })
+      }
+
+      class AstroSearch extends HTMLElement {
+        constructor() {
+          super()
+
+          const posttitles = (this.dataset.posttitles as string).split(',')
+          const searchForm = this.querySelector('input')
+          const searchAction = () => {
+            if(searchForm) {
+              const keyword = searchForm.value
+              const results = filterArrayByKeyword(keyword, posttitles)
+              showResults(results)
+            }
+          }
+
+          if(searchForm)
+            searchForm.addEventListener('input', searchAction)
+        }
+      }
+
+      customElements.define('astro-search', AstroSearch)
+    </script>
+	</body>
+</html>
